@@ -17,7 +17,7 @@ export const IDLE_ACTIONS = {
   dumbbell: { chance: 2, where: 'dumbbell', secs: [60, 110], label: '舉啞鈴' },
   toilet: { chance: 3, where: 'toilet', secs: [60, 100], label: '上廁所' },
   // 偷玩 Minecraft 12%（螢幕顯示他的機器人第一人稱畫面；Minecraft 沒開時用內建小遊戲）、趴睡 5%
-  game: { chance: 12, where: 'seat', secs: [60, 180], label: '偷玩遊戲' },
+  game: { chance: 12, where: 'seat', secs: [60, 180], label: '玩遊戲' },
   sleep: { chance: 5, where: 'seat', secs: [60, 150], label: '趴睡' },
 };
 
@@ -50,7 +50,7 @@ const EXTRA_TEXT = {
 // 面板用的動作說明（名牌不顯示動作）
 export function actionText(seat) {
   const w = seat.walk;
-  if (w.mode === 'seated' && seat.action === 'game') return seat.game?.mc ? '偷玩 Minecraft' : '偷玩內建小遊戲';
+  if (w.mode === 'seated' && seat.action === 'game') return '玩遊戲';
   if (w.mode === 'going') return `走去${IDLE_ACTIONS[w.activity].label}`;
   if (w.mode === 'returning') return w.run ? EXTRA_TEXT.run : EXTRA_TEXT.back;
   return IDLE_ACTIONS[seat.action]?.label || EXTRA_TEXT[seat.action] || seat.action;

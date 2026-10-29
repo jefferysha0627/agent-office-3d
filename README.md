@@ -164,6 +164,7 @@ npm run minecraft:setup
 
 2. 終端機會印出連線方式。在**同一台電腦**打開 Minecraft Java 版，版本選 **1.21.4**，多人遊戲 → 直接連線 → `localhost:25570`。
 3. 進來後會自動變成**觀察者模式**：可以飛、穿牆，不會碰到世界。按數字鍵 `1`（或滑鼠中鍵打開觀察者選單）選員工，就能跳到他身上看。
+4. 想拍影片時，可以加上 `DEMO_ALL_IDLE=1`（只在示範模式有效），讓所有示範員工一直閒置、持續在 Minecraft 裡活動。
 
 設定的名稱會跟機器人一起放進白名單，不在名單上的人連不進來。
 
@@ -328,6 +329,7 @@ If you own Minecraft Java Edition, you can join the same world and fly next to y
 
 2. The terminal prints how to connect. On **the same computer**, open Minecraft Java Edition **1.21.4** → Multiplayer → Direct Connection → `localhost:25570`.
 3. You are switched to **spectator mode** automatically: fly, pass through walls, never touch the world. Press `1` (or the middle mouse button for the spectator menu) and pick a staff member to jump into their view.
+4. For filming, add `DEMO_ALL_IDLE=1` (demo mode only) to keep every demo staff member idle and playing Minecraft.
 
 Guest names are added to the whitelist together with the bots; anyone else is rejected.
 
