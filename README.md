@@ -130,7 +130,7 @@ Copy-Item office.config.example.json office.config.json  # Windows PowerShell
 
 員工閒置時會進同一個 Minecraft 世界：挖礦、砍樹、蓋小屋。每位員工一個 [Mineflayer](https://github.com/PrismarineJS/mineflayer) 機器人，畫面用 [prismarine-viewer](https://github.com/PrismarineJS/prismarine-viewer) 串到他桌上的螢幕。
 
-![員工螢幕上的 Minecraft 第一人稱畫面：準星、快捷欄、手持方塊都是機器人的真實狀態](docs/screenshots/minecraft.png)
+![員工螢幕上的 Minecraft 第一人稱畫面：機器人砍樹（方塊出現裂痕、揮動斧頭、木頭數量增加）後走路穿過森林，快捷欄與手持工具都是機器人的真實狀態](docs/screenshots/minecraft-closeup.gif)
 
 ```bash
 npm run minecraft:setup
@@ -278,7 +278,7 @@ Copy `office.config.example.json` to `office.config.json` and edit it (it is git
 
 ### Minecraft (optional)
 
-![A staff member's Minecraft first-person view with crosshair, real hotbar and held block](docs/screenshots/minecraft.png)
+![A staff member's Minecraft first-person view: the bot chops a tree (block cracks, axe swings, log count goes up) and walks through the forest; hotbar and held tool are the bot's real state](docs/screenshots/minecraft-closeup.gif)
 
 ```bash
 npm run minecraft:setup

@@ -5,15 +5,20 @@ const { Vec3 } = require('vec3');
 
 // 白天各任務的權重
 const TASKS = { explore: 3, chop: 3, mine: 2, build: 2 };
+// 示範模式：被看的時候多做看得出動作的事（挖、砍、蓋），少站著發呆；接真的 Agent 時用上面的權重
+const DEMO_TASKS = { explore: 1, chop: 4, mine: 4, build: 3 };
+const PAUSE = { normal: [1500, 4000], demo: [400, 1000] };
 const TASK_TIMEOUT_MS = 60000;
+const DEMO_TASK_TIMEOUT_MS = 25000;
+const DEMO_STALL_MS = 4000; // 示範模式：走路時 4 秒沒前進（也沒在挖）就放棄這個目標，換下一件事
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const rand = (a, b) => a + Math.random() * (b - a);
 
-function pickTask() {
-  const total = Object.values(TASKS).reduce((a, b) => a + b, 0);
+function pickTask(weights) {
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
-  for (const [name, w] of Object.entries(TASKS)) {
+  for (const [name, w] of Object.entries(weights)) {
     r -= w;
     if (r <= 0) return name;
   }
@@ -21,8 +26,9 @@ function pickTask() {
 }
 
 class Brain {
-  constructor(bot, { home, onHome, log }) {
+  constructor(bot, { home, onHome, log, demo = false }) {
     this.bot = bot;
+    this.demo = demo;
     this.home = home; // { x, y, z } 或 null（第一次啟用時決定）
     this.onHome = onHome;
     this.log = log;
@@ -85,14 +91,16 @@ class Brain {
       try {
         if (!this.home) await this.chooseHome(token);
         const night = this.isNight();
-        const name = night ? 'goHome' : pickTask();
+        const name = night ? 'goHome' : pickTask(this.demo ? DEMO_TASKS : TASKS);
         this.task = name;
-        await this.withTimeout(this[name](token), TASK_TIMEOUT_MS);
+        await this.withTimeout(this[name](token), this.demo ? DEMO_TASK_TIMEOUT_MS : TASK_TIMEOUT_MS);
       } catch (e) {
-        if (this.alive(token)) this.log?.(`task ${this.task} 失敗：${e.message}`);
+        // 示範模式卡住時是我們自己喊停的，不算錯誤
+        const expected = this.demo && /was stopped/i.test(e.message);
+        if (this.alive(token) && !expected) this.log?.(`task ${this.task} 失敗：${e.message}`);
       }
       this.bot.pathfinder.setGoal(null);
-      if (this.alive(token)) await this.lookAround(token, rand(1500, 4000));
+      if (this.alive(token)) await this.lookAround(token, rand(...(this.demo ? PAUSE.demo : PAUSE.normal)));
     }
   }
 
@@ -116,7 +124,27 @@ class Brain {
 
   async goto(goal, token) {
     if (!this.alive(token)) return;
-    await this.bot.pathfinder.goto(goal);
+    if (!this.demo) return this.bot.pathfinder.goto(goal);
+    // 示範模式：卡住（找不到路、被地形擋住）就停下來，不要在螢幕上站著不動
+    const bot = this.bot;
+    let last = bot.entity.position.clone();
+    let lastMove = Date.now();
+    const watch = setInterval(() => {
+      const p = bot.entity?.position;
+      if (!p) return;
+      if (p.distanceTo(last) > 0.3 || bot.targetDigBlock || bot.pathfinder.isMining?.()) {
+        last = p.clone();
+        lastMove = Date.now();
+      } else if (Date.now() - lastMove > DEMO_STALL_MS) {
+        clearInterval(watch);
+        bot.pathfinder.stop();
+      }
+    }, 500);
+    try {
+      await bot.pathfinder.goto(goal);
+    } finally {
+      clearInterval(watch);
+    }
   }
 
   // ---- 家 ----
@@ -141,7 +169,7 @@ class Brain {
     const a = Math.random() * Math.PI * 2;
     const d = rand(10, 26);
     await this.goto(new goals.GoalXZ(Math.round(h.x + Math.cos(a) * d), Math.round(h.z + Math.sin(a) * d)), token);
-    await this.lookAround(token, 3000);
+    await this.lookAround(token, this.demo ? 800 : 3000);
   }
 
   async chop(token) {

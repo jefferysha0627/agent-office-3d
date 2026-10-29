@@ -393,6 +393,7 @@ if (config.minecraft.enabled) {
         MC_JAVA: config.minecraft.java,
         MC_MEMORY: config.minecraft.memory,
         OFFICE_STAFF: config.staff.map((s) => s.id).join(','),
+        OFFICE_DEMO: config.source.type === 'demo' ? '1' : '0',
       },
     });
     mcChild.on('exit', () => (mcChild = null));

@@ -20,6 +20,8 @@ const STATUS_PORT = Number(process.env.MC_STATUS_PORT || 4879);
 const VIEWER_BASE_PORT = 4881;
 const OFFICE = `http://127.0.0.1:${process.env.PORT || 4870}`;
 const STAFF = (process.env.OFFICE_STAFF || '').split(',').filter(Boolean);
+// 示範模式（狀態來源是 demo）：機器人多做看得出動作的事，開場設成白天
+const DEMO = process.env.OFFICE_DEMO === '1';
 const MAX_BOTS = 8;
 const STATE_FILE = path.join(MC_DIR, 'office-bots.json');
 // 第一次進世界時給的起始工具與建材（透過伺服器主控台 give）
@@ -145,6 +147,7 @@ function createBot(name) {
       saveState();
     },
     log: (m) => log(`${name}: ${m}`),
+    demo: DEMO,
   });
   bot.once('spawn', () => {
     entry.connected = true;
@@ -177,6 +180,8 @@ function wantedBots() {
 }
 
 function onServerReady() {
+  // 示範模式開場設成白天（晚上機器人會回家站著，看不出在做什麼）；不改遊戲規則，接真的 Agent 時不動
+  if (DEMO) console_('time set day');
   syncBots();
 }
 
