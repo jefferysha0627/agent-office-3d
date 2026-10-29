@@ -446,5 +446,17 @@ server.listen(PORT, HOST, () => {
   const url = `http://${HOST}:${PORT}/`;
   console.log(`Agent Office 3D：${url}  （只綁本機，Ctrl+C 停止）`);
   console.log(`狀態來源：${source.type === 'demo' ? 'demo（示範用假狀態）' : 'herdr（唯讀）'}・設定檔：${config.file ? path.relative(ROOT, config.file) : '（預設值）'}`);
-  if (config.openBrowser) openBrowser(url);
+  if (!config.openBrowser) return;
+  if (!mcChild) return openBrowser(url);
+  // 開了 Minecraft：等第一個機器人進世界再開瀏覽器（最多等 3 分鐘），一打開就看得到員工在玩
+  const t0 = Date.now();
+  const timer = setInterval(async () => {
+    const st = await fetchMcStatus();
+    const waited = Date.now() - t0 > 180e3;
+    if (st.bots.some((b) => b.connected) || waited || !mcChild) {
+      clearInterval(timer);
+      if (!waited) console.log('機器人已進入 Minecraft 世界，打開瀏覽器');
+      openBrowser(url);
+    }
+  }, 2000);
 });

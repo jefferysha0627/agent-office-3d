@@ -166,7 +166,9 @@ for (const seat of seats) createWalk(seat);
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const speed = FAST ? 0.2 : 1;
-const behaviorOpts = { speed, forced: FORCED_IDLE };
+// 示範模式：剛閒置時先偷玩遊戲、之後也比較常玩，打開頁面幾秒內就看得到 Minecraft；接真的 Agent 時維持原本機率
+const DEMO = CONFIG.source === 'demo';
+const behaviorOpts = { speed, forced: FORCED_IDLE, ...(DEMO ? { chance: { game: 140 }, firstDelay: [3, 8], firstIdle: 'game' } : {}) };
 
 function screenMode(seat) {
   if (seat.status === 'absent') return 'off';
@@ -182,7 +184,7 @@ function screenMode(seat) {
 // ---- Minecraft：偷玩遊戲時，螢幕顯示該員工機器人的第一人稱畫面 ----
 // 每位員工一個 Mineflayer 機器人（mc/run.cjs）。畫面頁面 /mc/<員工>/ 與辦公室同源，
 // 用隱藏的 iframe 開著（有人在看，機器人才會動），每秒約 12 格畫到員工螢幕上。
-// 沒有機器人（Minecraft 沒開、還在連線）時用內建小遊戲。
+// Minecraft 沒開時用內建小遊戲；開了的話一律玩 Minecraft，機器人還沒連上時螢幕先顯示載入中。
 
 let mcBots = new Map();
 async function loadMc() {
@@ -203,15 +205,22 @@ mcHost.setAttribute('aria-hidden', 'true');
 document.body.append(mcHost);
 
 function startGame(seat) {
-  if (!mcBots.get(seat.name)?.connected) {
+  if (!CONFIG.minecraft) {
     seat.game = { mc: false };
     return;
   }
+  seat.game = { mc: true, iframe: null, frames: 0, next: 0 };
+  attachMc(seat);
+}
+
+// 機器人連上了才開畫面頁（每格都會重試，晚連上的機器人也接得上）
+function attachMc(seat) {
+  if (seat.game.iframe || !mcBots.get(seat.name)?.connected) return;
   const iframe = document.createElement('iframe');
   iframe.src = `/mc/${encodeURIComponent(seat.name)}/`;
   iframe.tabIndex = -1;
   mcHost.append(iframe);
-  seat.game = { mc: true, iframe, frames: 0, next: 0 };
+  seat.game.iframe = iframe;
 }
 
 // 關掉 iframe：畫面斷線，機器人就停下來
@@ -224,7 +233,7 @@ function drawMc(seat, t) {
   const g = seat.game;
   let canvas = null;
   try {
-    canvas = g.iframe.contentWindow?.__mcRenderer?.domElement || null;
+    canvas = g.iframe?.contentWindow?.__mcRenderer?.domElement || null;
   } catch {
     canvas = null;
   }
@@ -580,7 +589,7 @@ function applyData(data) {
       seat.status = status;
       if ((status === 'idle' || status === 'done') && !wasIdle && seat.walk.mode === 'seated') {
         seat.action = 'sit';
-        seat.actionUntil = now + rand(...IDLE_TIMING.firstDelay) * speed;
+        seat.actionUntil = now + rand(...(behaviorOpts.firstDelay || IDLE_TIMING.firstDelay)) * speed;
       }
     }
     seat.screen.setLines(seat.data?.lines);
@@ -860,6 +869,7 @@ function frame() {
     updateWorker(seat, t, dt, behaviorOpts);
     const playing = seat.action === 'game' && seat.walk.mode === 'seated' && seat.status !== 'absent';
     if (playing && !seat.game) startGame(seat);
+    else if (playing && seat.game.mc) attachMc(seat);
     else if (!playing && seat.game) stopGame(seat);
     animateSeat(seat, t, dt);
   }

@@ -6,9 +6,24 @@ Turn your AI coding agents into staff in a little 3D office. See at a glance who
 
 [English](#english) ・ Built with [Claude Code](https://claude.com/claude-code) ・ Made by SparCode studio
 
-![Agent Office 3D 預設畫面（示範模式）](docs/screenshots/office.png)
+![示範員工閒置時偷玩 Minecraft：兩台螢幕是各自機器人的第一人稱畫面，最後是螢幕特寫](docs/screenshots/office-minecraft.gif)
 
-> 截圖都是示範模式（demo），員工、任務、專案和金額全部是虛構的。
+> 畫面都是示範模式（demo），員工、任務、專案和金額全部是虛構的。
+
+## 快速看麥塊
+
+不用接自己的 Agent，兩個指令就能看到示範員工偷玩 Minecraft（需要 Node.js 20 以上、Java 21 以上）：
+
+```bash
+npm ci
+npm run demo:minecraft
+```
+
+第一次執行會先跑 `minecraft:setup`：檢查 Java、請你同意 Minecraft EULA、從 Mojang 官方下載伺服器並驗證。產生世界約 1～2 分鐘，機器人進世界後自動打開瀏覽器，幾秒內就會有員工開始玩。按 `Ctrl+C` 停止，世界會先存檔。
+
+**為什麼要你自己輸入 `yes`？** Minecraft 伺服器軟體屬於 Mojang，執行前必須由使用者本人同意 [Minecraft EULA](https://aka.ms/MinecraftEULA)。這個 repo 不能也不會替你同意，所以不附任何 Mojang 檔案，也不會跳過這一步；你不同意的話，就不會下載任何東西。
+
+只想看辦公室（不需要 Java）：`npm start`。
 
 ⭐ 覺得有趣的話，歡迎幫這個 repo 點個星星，讓更多人看到！
 ⭐ If you find this fun, a star on the repo would mean a lot!
@@ -118,7 +133,12 @@ npm run minecraft:setup
 3. 從 Mojang 官方版本清單下載 1.21.4 伺服器 jar，並驗證 sha1。
 4. 寫入只綁 `127.0.0.1` 的 `server.properties`（白名單只有辦公室的機器人）。
 
-完成後把 `office.config.json` 的 `minecraft.enabled` 改成 `true`，再 `npm start`。第一次產生世界約需 1～2 分鐘。
+完成後把 `office.config.json` 的 `minecraft.enabled` 改成 `true`，再 `npm start`。第一次產生世界約需 1～2 分鐘。只想先看示範的話，用 `npm run demo:minecraft` 就好（示範員工＋Minecraft，不用改設定檔）。
+
+- 開了 Minecraft 時，偷玩遊戲一律是 Minecraft，不會換成內建小遊戲；機器人還沒連上時螢幕先顯示載入中。
+- 機器人只在員工閒置、而且有人開著辦公室畫面時才會動；員工一回去工作，機器人就停下來。
+- 示範模式會讓閒置的員工先去玩 Minecraft、也比較常玩；接真的 Agent 時維持原本的機率（約 12%）。
+- 資源用量參考（macOS、5 個機器人、有人在看）：Minecraft 伺服器約 450 MB 記憶體，機器人程序與辦公室伺服器各約 170 MB，CPU 合計約一顆核心的 15%。
 
 - 這個 repo 不包含任何 Mojang 的檔案；伺服器 jar、EULA、世界存檔都在本機的 `minecraft/`，不進版控。
 - 在 `npm start` 的終端機輸入文字會轉給 Minecraft 主控台（例如 `time set day`、`list`）。
@@ -132,8 +152,8 @@ npm run minecraft:setup
 **辦公室會替我的 Agent 下指令嗎？**
 不會。辦公室只讀狀態和終端畫面；唯一的寫入是在布告欄勾選待辦（寫進 `data/board.json`）。
 
-**沒有 Agent 也能玩嗎？**
-可以。預設的示範模式就是給你先看效果用的。
+**不用接自己的 Agent 也看得到嗎？**
+看得到。`npm start` 是示範辦公室，`npm run demo:minecraft` 是示範員工加上 Minecraft，都不需要任何 Agent。之後想接真的 Agent，再看下面的「Herdr 模式」。
 
 **為什麼我的員工都「不在線」？**
 Herdr 模式下，`staff[].id` 要和 `herdr agent list` 裡的名稱完全一樣。
@@ -163,7 +183,7 @@ lib/board-store.js     布告欄資料
 lib/projects-store.js  書架專案資料庫（只讀）
 public/                前端（Three.js）
 mc/                    Minecraft 機器人與畫面串流
-scripts/               minecraft:setup、語法檢查、冒煙測試
+scripts/               minecraft:setup、demo:minecraft、語法檢查、冒煙測試
 data/                  範例資料（全部虛構）
 ```
 
@@ -217,6 +237,17 @@ npm start
 
 The office opens at http://127.0.0.1:4870/ in **demo mode**: fake statuses rotate so you can see it working without any agent. Press `Ctrl+C` to stop.
 
+**See the Minecraft breaks** (Java 21+ required), still without connecting any agent:
+
+```bash
+npm ci
+npm run demo:minecraft
+```
+
+On first run it calls `minecraft:setup` (Java check, Minecraft EULA, official download with SHA-1 check). The world takes 1–2 minutes to generate; the browser opens once the bots are in, and within seconds a demo staff member starts playing. `Ctrl+C` saves the world and stops everything.
+
+**Why do you have to type `yes` yourself?** The Minecraft server belongs to Mojang, and its [EULA](https://aka.ms/MinecraftEULA) must be accepted by you, the person running it. This repo cannot accept it for you, so it ships no Mojang files and never skips that step. If you don't agree, nothing is downloaded.
+
 ### Configuration
 
 Copy `office.config.example.json` to `office.config.json` and edit it (it is git-ignored). Key fields: `company` (name, currency, logo), `owner` (the person at the front desk), `staff[]` (`id` must match the agent name in your status source, plus `title` and uniform `color`, up to 8), `source.type` (`demo` or `herdr`), `data.*` (board, bookshelf and task folders) and `minecraft.*`. See the Chinese table above for every field and [docs/board-format.md](docs/board-format.md) for the board and bookshelf data format.
@@ -236,11 +267,18 @@ npm run minecraft:setup
 3. Downloads the 1.21.4 server jar from Mojang's official version manifest and verifies its SHA-1.
 4. Writes a `server.properties` bound to `127.0.0.1` with a whitelist.
 
-Then set `minecraft.enabled` to `true` and run `npm start`. No Mojang files are included in this repo.
+Then set `minecraft.enabled` to `true` and run `npm start` (or just `npm run demo:minecraft` for the demo staff, no config change needed). No Mojang files are included in this repo.
+
+- With Minecraft on, game breaks are always Minecraft (a loading screen shows until the bot connects).
+- Bots only move while their staff member is idle and someone is watching the office; they stop as soon as the agent goes back to work.
+- Demo mode sends newly idle staff to Minecraft first and picks it more often; real agents keep the normal odds (about 12%).
+- Rough resource use (macOS, 5 bots, page open): Minecraft server ~450 MB RAM, bot process and office server ~170 MB each, about 15% of one CPU core in total.
 
 ### FAQ
 
 **Does Minecraft burn tokens?** No. The in-game staff are rule-based Mineflayer bots (chop trees, mine, build). They never call an AI model.
+
+**Can I see it without connecting my own agents?** Yes. `npm start` runs the demo office and `npm run demo:minecraft` adds Minecraft, no agent needed.
 
 **Can the office control my agents?** No. It only reads status and terminal output. The only write is ticking a to-do on the board.
 

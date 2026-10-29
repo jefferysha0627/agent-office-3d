@@ -83,10 +83,12 @@ function pickIdle(seat, opts) {
   if (fa && (fa.where === 'seat' || SPOTS[fa.where].user == null)) return forced;
   // 有人在用的地點（咖啡機、跑步機…）先不排
   const entries = Object.entries(IDLE_ACTIONS).filter(([, a]) => a.where === 'seat' || SPOTS[a.where].user == null);
-  const total = entries.reduce((s, [, a]) => s + a.chance, 0);
+  // opts.chance 可以覆寫個別動作的機率（示範模式提高玩遊戲的機率）
+  const chance = (name, a) => opts.chance?.[name] ?? a.chance;
+  const total = entries.reduce((s, [name, a]) => s + chance(name, a), 0);
   let r = Math.random() * total;
   for (const [name, a] of entries) {
-    r -= a.chance;
+    r -= chance(name, a);
     if (r <= 0) return name;
   }
   return entries[entries.length - 1][0];
@@ -175,15 +177,19 @@ export function updateWorker(seat, now, dt, opts) {
   }
   if (st === 'idle' || st === 'done') {
     if (seat.action === 'typing' || seat.action === 'blocked' || seat.action === 'walk') {
+      seat.idlePicks = 0;
       seat.action = 'sit';
-      seat.actionUntil = now + rand(...IDLE_TIMING.firstDelay) * opts.speed;
+      seat.actionUntil = now + rand(...(opts.firstDelay || IDLE_TIMING.firstDelay)) * opts.speed;
     }
     if (now >= seat.actionUntil) {
       if (seat.action !== 'sit') {
         seat.action = 'sit';
         seat.actionUntil = now + rand(...IDLE_TIMING.between) * opts.speed;
       } else {
-        startAction(seat, pickIdle(seat, opts), now, opts.speed, seat.screen);
+        // opts.firstIdle：剛閒置時第一個動作固定（示範模式用 game，一打開就看得到有人在玩）
+        const first = opts.firstIdle && !seat.idlePicks ? opts.firstIdle : null;
+        seat.idlePicks = (seat.idlePicks || 0) + 1;
+        startAction(seat, first || pickIdle(seat, opts), now, opts.speed, seat.screen);
       }
     }
     return;

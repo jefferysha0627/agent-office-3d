@@ -4,13 +4,13 @@
 // 3. 從 Mojang 官方版本清單下載 1.21.4 伺服器 jar，並驗證 sha1
 // 4. 寫入只綁 127.0.0.1 的 server.properties
 // 這個 repo 不附任何 Mojang 檔案；jar 與世界存檔都放在 minecraft/（不進版控）。
-import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { promises as fs, existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { loadConfig } from '../lib/config.js';
+import { javaMajor, javaHelp } from '../lib/java.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MC_DIR = path.join(ROOT, 'minecraft');
@@ -40,27 +40,6 @@ const config = loadConfig(ROOT);
 const step = (n, text) => console.log(`\n[${n}/4] ${text}`);
 
 // ---- 1. Java ----
-
-function javaMajor(bin) {
-  const r = spawnSync(bin, ['-version'], { encoding: 'utf8', windowsHide: true });
-  if (r.error || r.status !== 0) return null;
-  const m = /version "(\d+)(?:\.(\d+))?/.exec(`${r.stderr}${r.stdout}`);
-  if (!m) return null;
-  return m[1] === '1' ? Number(m[2]) : Number(m[1]);
-}
-
-function javaHelp() {
-  console.log(`
-需要 Java 21 以上。安裝方式：
-  macOS（Homebrew）： brew install openjdk@21
-                     然後把 office.config.json 的 minecraft.java 設成 /opt/homebrew/opt/openjdk@21/bin/java
-                     （Intel Mac 是 /usr/local/opt/openjdk@21/bin/java）
-  Windows：          winget install Microsoft.OpenJDK.21
-                     裝好後重新開一個終端機視窗，java -version 應該顯示 21
-  Linux（Debian／Ubuntu）： sudo apt install openjdk-21-jre-headless
-也可以從 https://adoptium.net/ 下載 Temurin 21。
-如果 java 不在 PATH 上，請在 office.config.json 設定 minecraft.java 為 java 執行檔的完整路徑。`);
-}
 
 step(1, `檢查 Java（${config.minecraft.java}）`);
 const major = javaMajor(config.minecraft.java);
@@ -153,6 +132,10 @@ for (const [k, v] of Object.entries(PROPERTIES)) if (!done.has(k)) lines.push(`$
 await fs.writeFile(propsFile, lines.filter((l, i) => l || i < lines.length - 1).join('\n') + '\n');
 console.log('server.properties：server-ip=127.0.0.1、server-port=25570、白名單開啟');
 
+if (process.env.OFFICE_SETUP_FROM_DEMO === '1') {
+  console.log('\nMinecraft 設定完成，接著啟動示範辦公室…');
+  process.exit(0);
+}
 console.log(`
 完成。接下來：
   1. 打開 office.config.json，把 "minecraft": { "enabled": false } 改成 true
