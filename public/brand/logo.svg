@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 600 170">
+  <rect width="600" height="170" fill="#ffffff"/>
+  <g transform="translate(36 25)">
+    <rect width="120" height="120" rx="28" fill="#1d3958"/>
+    <rect x="24" y="24" width="30" height="30" rx="6" fill="#c8aa62"/>
+    <rect x="66" y="24" width="30" height="30" rx="6" fill="#ffffff"/>
+    <rect x="24" y="66" width="30" height="30" rx="6" fill="#ffffff"/>
+    <rect x="66" y="66" width="30" height="30" rx="6" fill="#ffffff"/>
+    <circle cx="81" cy="81" r="8" fill="#3fa66b"/>
+  </g>
+  <text x="186" y="94" font-family="Helvetica, Arial, sans-serif" font-size="62" font-weight="700" fill="#1d3958">Agent Office</text>
+  <text x="190" y="134" font-family="Helvetica, Arial, sans-serif" font-size="25" letter-spacing="9" fill="#9a7b3a">YOUR AI TEAM IN 3D</text>
+</svg>

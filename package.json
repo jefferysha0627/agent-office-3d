@@ -1,0 +1,32 @@
+{
+  "name": "agent-office-3d",
+  "version": "0.1.0",
+  "description": "A local 3D office that shows your AI coding agents as staff: live status, terminal output, a bulletin board, a project bookshelf, and optional Minecraft breaks.",
+  "license": "MIT",
+  "author": "Jeffery Sha",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node scripts/check.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "minecraft:setup": "node scripts/minecraft-setup.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai-agents",
+    "claude-code",
+    "three.js",
+    "minecraft",
+    "mineflayer",
+    "herdr"
+  ],
+  "dependencies": {
+    "mineflayer": "4.39.0",
+    "mineflayer-pathfinder": "2.4.5",
+    "prismarine-viewer": "1.33.0",
+    "three": "0.186.1"
+  }
+}

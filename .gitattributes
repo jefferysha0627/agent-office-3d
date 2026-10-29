@@ -1,0 +1,8 @@
+# 文字檔一律用 LF 存進 repo，各平台取出時由 Git 自動處理；圖片當二進位
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary

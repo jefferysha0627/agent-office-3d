@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+Thumbs.db
+
+# 個人設定（從 office.config.example.json 複製後自己改）
+office.config.json
+
+# 布告欄的實際資料（第一次啟動時從 data/board.example.json 複製），可能含你的收入數字
+data/board.json
+data/board.json.bak
+data/board.json.tmp-*
+
+# Minecraft：伺服器 jar、EULA、世界存檔都由 npm run minecraft:setup 在本機產生，不進版控
+minecraft/

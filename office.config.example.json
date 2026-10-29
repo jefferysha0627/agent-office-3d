@@ -1,0 +1,29 @@
+{
+  "port": 4870,
+  "openBrowser": true,
+  "company": {
+    "name": "Agent Office",
+    "currency": "$",
+    "logo": "public/brand/logo.svg",
+    "mark": "public/brand/mark.svg"
+  },
+  "owner": { "name": "Owner", "title": "負責人" },
+  "cat": { "name": "麻糬" },
+  "staff": [
+    { "id": "lead", "title": "主管", "color": "#c8aa62" },
+    { "id": "coder", "title": "工程師", "color": "#3fa66b" },
+    { "id": "writer", "title": "文案", "color": "#e8833a" },
+    { "id": "reviewer", "title": "審查", "color": "#8a5cc2" }
+  ],
+  "source": {
+    "type": "demo",
+    "herdr": { "bin": "herdr", "args": [], "readLines": 40 }
+  },
+  "data": {
+    "board": "data/board.json",
+    "boardExample": "data/board.example.json",
+    "projects": "data/projects",
+    "tasks": "data/tasks"
+  },
+  "minecraft": { "enabled": false, "java": "java", "memory": "2G" }
+}

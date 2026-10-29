@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "goal": { "text": "（範例）今年完成 12 個網站專案，每個月留一天整理作品集", "amount": 300000 },
+  "kpis": [
+    { "id": "revenue", "name": "本月收入", "unit": "$", "type": "manual", "value": 18500, "target": 25000 },
+    { "id": "deals", "name": "本月新案", "unit": "件", "type": "manual", "value": 1, "target": 2 },
+    { "id": "quotes", "name": "本月報價", "unit": "份", "type": "manual", "value": 4, "target": 4 },
+    { "id": "cases", "name": "進行中專案", "unit": "案", "type": "auto", "note": "書架上狀態為進行中的專案數" },
+    { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "type": "auto", "note": "本月修改過、狀態寫「完成」的任務檔" }
+  ],
+  "weekly": [
+    { "id": "w-1", "text": "（範例）燈塔咖啡首頁改版定稿" },
+    { "id": "w-2", "text": "（範例）茶屋訂位頁等客戶回覆" },
+    { "id": "w-3", "text": "（範例）整理兩個結案專案的作品集" }
+  ],
+  "todos": [
+    { "id": "t-1", "text": "（範例）選燈塔咖啡首頁主視覺：A 版或 B 版", "done": false, "file": "燈塔咖啡_首頁改版.md" },
+    { "id": "t-2", "text": "（範例）回覆茶屋訂位頁的時段問題", "done": false, "file": "茶屋_訂位表單.md" },
+    { "id": "t-3", "text": "（範例）確認下個月的報價範本", "done": false },
+    { "id": "t-4", "text": "（範例）看 3D 辦公室的布告欄，勾掉這一項試試看", "done": false },
+    { "id": "t-5", "text": "（範例）整理作品集", "done": true, "doneAt": "2026-10-20T08:00:00.000Z", "file": "內部_整理作品集.md" }
+  ],
+  "archive": {
+    "projects": [
+      { "name": "燈塔咖啡官網", "period": "2026-09～", "status": "進行中", "contract": 36000, "received": 18000, "note": "（範例）頭期已收，尾款上線後收" },
+      { "name": "茶屋訂位頁", "period": "2026-08～", "status": "暫停", "contract": 15000, "received": 7500, "note": "（範例）等客戶確認時段規則" },
+      { "name": "像素遊戲活動頁", "period": "2026-05～06", "status": "已結案", "contract": 22000, "received": 22000, "note": "（範例）活動報名＋排行榜" },
+      { "name": "筆記 App 介紹頁", "period": "2026-03～04", "status": "已結案", "contract": 12500, "received": 12500, "note": "（範例）單頁介紹＋下載連結" }
+    ]
+  },
+  "history": [
+    { "month": "2026-04", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 12000, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 1, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 3, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 5, "target": null }] },
+    { "month": "2026-05", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 15500, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 2, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 5, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 7, "target": null }] },
+    { "month": "2026-06", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 9800, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 0, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 2, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 4, "target": null }] },
+    { "month": "2026-07", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 21000, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 1, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 4, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 8, "target": null }] },
+    { "month": "2026-08", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 17600, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 2, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 6, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 6, "target": null }] },
+    { "month": "2026-09", "kpis": [{ "id": "revenue", "name": "本月收入", "unit": "$", "value": 26500, "target": 25000 }, { "id": "deals", "name": "本月新案", "unit": "件", "value": 1, "target": 2 }, { "id": "quotes", "name": "本月報價", "unit": "份", "value": 3, "target": 4 }, { "id": "tasks-done", "name": "本月完成任務", "unit": "張", "value": 9, "target": null }] }
+  ]
+}

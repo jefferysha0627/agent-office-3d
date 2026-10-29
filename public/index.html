@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Agent Office 3D</title>
+    <meta name="description" content="本機 3D 辦公室：AI Agent 員工的即時狀態、任務與布告欄（只讀）" />
+    <link rel="icon" href="/api/brand/mark" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <img class="brand-mark" src="/api/brand/mark" alt="" width="24" height="24" />
+        <h1 id="company-name">Agent Office 3D</h1>
+        <span id="source" class="source" data-kind="live">連線中…</span>
+        <span id="updated" class="updated"></span>
+      </div>
+      <div id="summary" class="summary"></div>
+      <button id="tasks-toggle" class="tasks-toggle" type="button">任務卡</button>
+    </header>
+    <div id="alert" class="alert" role="alert" hidden></div>
+
+    <main class="layout">
+      <section id="stage" class="stage" aria-label="3D 辦公室">
+        <div id="labels" class="labels"></div>
+        <div class="view-tools">
+          <button id="zoom-in" type="button" aria-label="放大">＋</button>
+          <button id="zoom-out" type="button" aria-label="縮小">－</button>
+          <button id="view-all" type="button">全景</button>
+          <button id="view-reset" type="button">重置視角</button>
+        </div>
+        <p class="hint">拖曳平移・滾輪縮放・點員工看終端</p>
+        <p id="webgl-error" class="webgl-error" hidden>這個瀏覽器無法啟用 WebGL，3D 畫面無法顯示。</p>
+
+        <section id="viewer" class="viewer" hidden role="dialog" aria-modal="true" aria-label="專屬介面">
+          <header class="v-head">
+            <div class="v-title">
+              <h2></h2>
+              <p class="v-sub"></p>
+            </div>
+            <nav class="v-tabs" aria-label="分頁"></nav>
+            <button class="v-back" type="button">← 返回辦公室</button>
+          </header>
+          <div class="v-body"></div>
+        </section>
+
+        <aside id="agent-panel" class="agent-panel" hidden aria-live="polite">
+          <div class="p-head">
+            <div>
+              <h2 class="p-name"></h2>
+              <p class="p-role"></p>
+            </div>
+            <button id="agent-close" type="button" class="close" aria-label="關閉">×</button>
+          </div>
+          <p><span class="p-status chip"></span> <span class="p-action"></span></p>
+          <p class="p-meta"></p>
+          <canvas class="p-screen" width="512" height="310" hidden></canvas>
+          <h3>最近終端輸出</h3>
+          <pre class="p-out"></pre>
+          <p class="p-note">只讀畫面：不能從這裡下指令。</p>
+        </aside>
+      </section>
+
+      <aside class="sidebar" aria-label="任務卡">
+        <div class="side-head">
+          <h2>任務卡 <span id="task-count" class="count"></span></h2>
+          <span class="side-sub">任務資料夾・最新在上</span>
+        </div>
+        <ul id="task-list" class="task-list"></ul>
+      </aside>
+    </main>
+
+    <dialog id="task-dialog" class="task-dialog">
+      <div class="d-head">
+        <div>
+          <h2 class="d-title"></h2>
+          <p class="d-meta"></p>
+        </div>
+        <button id="task-close" type="button" class="close" aria-label="關閉">×</button>
+      </div>
+      <pre class="d-body"></pre>
+    </dialog>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
