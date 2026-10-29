@@ -10,6 +10,9 @@ Turn your AI coding agents into staff in a little 3D office. See at a glance who
 
 > 截圖都是示範模式（demo），員工、任務、專案和金額全部是虛構的。
 
+⭐ 覺得有趣的話，歡迎幫這個 repo 點個星星，讓更多人看到！
+⭐ If you find this fun, a star on the repo would mean a lot!
+
 ## 功能
 
 - **員工即時狀態**：每位 Agent 一個座位，狀態燈與名牌顯示「工作中／閒置／完成待命／需要確認」。需要確認時名牌變紅、頭上冒驚嘆號。
@@ -101,6 +104,8 @@ Copy-Item office.config.example.json office.config.json  # Windows PowerShell
 ## Minecraft（選用）
 
 員工閒置時會進同一個 Minecraft 世界：挖礦、砍樹、蓋小屋。每位員工一個 [Mineflayer](https://github.com/PrismarineJS/mineflayer) 機器人，畫面用 [prismarine-viewer](https://github.com/PrismarineJS/prismarine-viewer) 串到他桌上的螢幕。
+
+![員工螢幕上的 Minecraft 第一人稱畫面：準星、快捷欄、手持方塊都是機器人的真實狀態](docs/screenshots/minecraft.png)
 
 ```bash
 npm run minecraft:setup
@@ -219,6 +224,8 @@ Copy `office.config.example.json` to `office.config.json` and edit it (it is git
 **Herdr mode**: set `source.type` to `"herdr"` and use your [Herdr](https://github.com/herdrdev/herdr) agent names as `staff[].id`. The office only runs the read-only commands `herdr agent list` and `herdr agent read`, enforced by an allowlist. To support another tool, add an adapter in `lib/sources.js`.
 
 ### Minecraft (optional)
+
+![A staff member's Minecraft first-person view with crosshair, real hotbar and held block](docs/screenshots/minecraft.png)
 
 ```bash
 npm run minecraft:setup
