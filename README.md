@@ -111,6 +111,7 @@ Copy-Item office.config.example.json office.config.json  # Windows PowerShell
 | `minecraft.enabled` | 是否啟動 Minecraft，預設 `false` |
 | `minecraft.java` | Java 執行檔，預設 `java` |
 | `minecraft.memory` | Minecraft 伺服器記憶體上限，預設 `2G` |
+| `minecraft.guests` | 可以進遊戲看員工的真人玩家名稱（陣列），預設空的；也可以用環境變數 `MC_GUESTS=name1,name2` |
 
 布告欄與書架的資料格式見 [docs/board-format.md](docs/board-format.md)。
 
@@ -149,6 +150,24 @@ npm run minecraft:setup
 - 機器人只在員工閒置、而且有人開著辦公室畫面時才會動；員工一回去工作，機器人就停下來。
 - 示範模式會讓閒置的員工先去玩 Minecraft、也比較常玩；接真的 Agent 時維持原本的機率（約 12%）。
 - 資源用量參考（macOS、5 個機器人、有人在看）：Minecraft 伺服器約 450 MB 記憶體，機器人程序與辦公室伺服器各約 170 MB，CPU 合計約一顆核心的 15%。
+
+### 從遊戲裡看你的員工
+
+有 Minecraft Java 版的話，可以自己進同一個世界，飛到員工旁邊看他們挖礦、砍樹、蓋房子。
+
+1. 把你的 Minecraft 玩家名稱（3～16 個英數字或底線，下面用 `YourName` 舉例）加進設定：`office.config.json` 的 `"minecraft": { "guests": ["YourName"] }`，或是啟動時用環境變數：
+
+   ```bash
+   MC_GUESTS=YourName npm run demo:minecraft                    # macOS／Linux
+   $env:MC_GUESTS="YourName"; npm run demo:minecraft            # Windows PowerShell
+   ```
+
+2. 終端機會印出連線方式。在**同一台電腦**打開 Minecraft Java 版，版本選 **1.21.4**，多人遊戲 → 直接連線 → `localhost:25570`。
+3. 進來後會自動變成**觀察者模式**：可以飛、穿牆，不會碰到世界。按數字鍵 `1`（或滑鼠中鍵打開觀察者選單）選員工，就能跳到他身上看。
+
+設定的名稱會跟機器人一起放進白名單，不在名單上的人連不進來。
+
+> 提醒：這個伺服器是離線模式（機器人不需要正版帳號），而且只綁 `127.0.0.1`，只能在這台電腦上使用。不要改綁定位址或開放對外連線。
 
 - 這個 repo 不包含任何 Mojang 的檔案；伺服器 jar、EULA、世界存檔都在本機的 `minecraft/`，不進版控。
 - 在 `npm start` 的終端機輸入文字會轉給 Minecraft 主控台（例如 `time set day`、`list`）。
@@ -295,6 +314,24 @@ Then set `minecraft.enabled` to `true` and run `npm start` (or just `npm run dem
 - Bots only move while their staff member is idle and someone is watching the office; they stop as soon as the agent goes back to work.
 - Demo mode sends newly idle staff to Minecraft first and picks it more often; real agents keep the normal odds (about 12%).
 - Rough resource use (macOS, 5 bots, page open): Minecraft server ~450 MB RAM, bot process and office server ~170 MB each, about 15% of one CPU core in total.
+
+#### Watch your staff from inside the game
+
+If you own Minecraft Java Edition, you can join the same world and fly next to your staff while they mine, chop and build.
+
+1. Add your Minecraft player name: `"minecraft": { "guests": ["YourName"] }` in `office.config.json`, or use an environment variable when starting:
+
+   ```bash
+   MC_GUESTS=YourName npm run demo:minecraft                    # macOS/Linux
+   $env:MC_GUESTS="YourName"; npm run demo:minecraft            # Windows PowerShell
+   ```
+
+2. The terminal prints how to connect. On **the same computer**, open Minecraft Java Edition **1.21.4** → Multiplayer → Direct Connection → `localhost:25570`.
+3. You are switched to **spectator mode** automatically: fly, pass through walls, never touch the world. Press `1` (or the middle mouse button for the spectator menu) and pick a staff member to jump into their view.
+
+Guest names are added to the whitelist together with the bots; anyone else is rejected.
+
+> Note: the server runs in offline mode (the bots don't need accounts) and only listens on `127.0.0.1`, so it only works on this computer. Do not change the bind address or open it to the network.
 
 ### FAQ
 

@@ -23,6 +23,8 @@ const STAFF = (process.env.OFFICE_STAFF || '').split(',').filter(Boolean);
 // 示範模式（狀態來源是 demo）：機器人多做看得出動作的事，開場設成白天
 const DEMO = process.env.OFFICE_DEMO === '1';
 const MAX_BOTS = 8;
+// 真人玩家（office.config.json 的 minecraft.guests 或 MC_GUESTS）：一起放進白名單，進來後自動改成觀察者
+const GUESTS = (process.env.MC_GUESTS || '').split(',').filter((n) => /^[A-Za-z0-9_]{3,16}$/.test(n));
 const STATE_FILE = path.join(MC_DIR, 'office-bots.json');
 // 第一次進世界時給的起始工具與建材（透過伺服器主控台 give）
 const STARTER_KIT = ['stone_pickaxe', 'stone_axe', 'stone_shovel', 'cobblestone 64', 'oak_planks 64', 'torch 16', 'bread 16'];
@@ -71,10 +73,10 @@ function loadState() {
 const state = loadState();
 const saveState = () => fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2) + '\n');
 
-// 白名單只放目前的員工機器人（離線 UUID）；有變動回傳 true
+// 白名單只放目前的員工機器人與設定的真人玩家（離線 UUID）；每次都整份重寫，所以 guests 不會被機器人同步蓋掉；有變動回傳 true
 function ensureWhitelist(names) {
   const file = path.join(MC_DIR, 'whitelist.json');
-  const want = [...new Set(names.map(mcName))].sort().map((n) => ({ uuid: offlineUuid(n), name: n }));
+  const want = [...new Set([...names.map(mcName), ...GUESTS])].sort().map((n) => ({ uuid: offlineUuid(n), name: n }));
   let current = '';
   try {
     current = fs.readFileSync(file, 'utf8');
@@ -118,6 +120,10 @@ function startServer() {
         onServerReady();
       } else if (/WARN|ERROR|joined the game|left the game|lost connection/.test(line)) {
         log(line.replace(/^\[[\d:]+\] /, ''));
+        // 真人玩家進來：改成觀察者（可以飛、穿牆看機器人，不會碰到世界）
+        const joined = /\]: ([A-Za-z0-9_]{3,16}) joined the game/.exec(line);
+        const isBot = joined && [...bots.values()].some((e) => mcName(e.name) === joined[1]);
+        if (joined && GUESTS.includes(joined[1]) && !isBot) setTimeout(() => console_(`gamemode spectator ${joined[1]}`), 500);
       }
     }
   });
@@ -179,7 +185,17 @@ function wantedBots() {
   return [...STAFF, ...others].slice(0, MAX_BOTS);
 }
 
+function printGuestHelp() {
+  if (!GUESTS.length) return;
+  log(`真人玩家（${GUESTS.join('、')}）可以進遊戲看員工：
+      1. 在同一台電腦打開 Minecraft Java 版，版本選 ${MC_VERSION}
+      2. 多人遊戲 → 直接連線 → 位址輸入 localhost:${MC_PORT}
+      3. 進來後會自動變成觀察者模式：可以飛、穿牆；按數字鍵 1 打開觀察者選單，選員工就能跳到他身上看
+      伺服器是離線模式而且只綁 127.0.0.1，只能在這台電腦上連。`);
+}
+
 function onServerReady() {
+  printGuestHelp();
   // 示範模式開場設成白天（晚上機器人會回家站著，看不出在做什麼）；不改遊戲規則，接真的 Agent 時不動
   if (DEMO) console_('time set day');
   syncBots();

@@ -8,6 +8,7 @@ This file is for AI coding agents (Claude Code, Codex, Cursor and others) that w
 - **Local only.** The office (port 4870) and the Minecraft server (port 25570) bind to `127.0.0.1`. Do not change the bind address, open firewall ports, set up port forwarding, tunnels (ngrok, cloudflared, Tailscale Funnel and similar), reverse proxies or any deployment. If the user asks for remote access, explain the risk below and do not set it up.
 - **Terminal output stays on this machine.** The office reads the user's agent terminals. Do not read that output (for example from `/api/state` or the agent panel) to send it anywhere, and never upload terminal output, board data or project files to any external service.
 - **Ask before installing system software.** Node.js, Java, Homebrew, winget and apt packages need the user's consent. Show the exact command, explain what it installs, and wait for a yes. Running `npm ci` inside this repo is fine.
+- **Guests do not open the server.** You may add the user's player names to `minecraft.guests` so they can watch from inside the game, but never change the bind address, `online-mode`, or open any network access because of it. Guests must play on the same computer.
 - **Herdr stays read-only.** If you connect Herdr, the office only runs `herdr agent list`, `get` and `read`. Do not run `herdr agent prompt`, `send-keys` or any other command that types into the user's agents.
 
 Why: the EULA is a legal agreement between the user and Mojang. The office shows terminal content that may include code, paths or secrets, so it must not be reachable from the network.
@@ -93,6 +94,7 @@ Edit `office.config.json` (create it from the example first). The server reads i
 | Staff | `staff[]`: `id` (agent name), `title`, `color` (`#rrggbb`), up to 8 |
 | Cat | `cat.name` |
 | Port | `port` (default 4870) |
+| Watch from inside Minecraft | `minecraft.guests`: the user's Minecraft player names (or `MC_GUESTS=name1,name2`); they join `localhost:25570` with Java Edition 1.21.4 on the same computer and become spectators |
 
 Board, bookshelf and task data live in `data/`; the format is in [docs/board-format.md](docs/board-format.md). The board reloads within a few seconds after `data/board.json` changes, no restart needed. Do not put passwords or tokens in these files.
 
@@ -125,6 +127,7 @@ Board, bookshelf and task data live in `data/`; the format is in [docs/board-for
 - 服務只綁本機（4870、25570）。不得改綁定位址、開防火牆、做 port forwarding、通道或反向代理，也不得部署到網路上。
 - 辦公室會讀使用者的 Agent 終端畫面。Agent 不讀取這些內容拿去他用，也不上傳終端內容、布告欄資料或專案檔到任何外部服務。
 - 安裝 Node.js、Java 等系統軟體前，先列出指令並取得使用者同意（repo 內的 `npm ci` 可以直接跑）。
+- 可以幫使用者設定 `minecraft.guests`（讓他從遊戲裡看員工），但不得因此改綁定位址、改 online-mode 或開放對外連線；真人玩家只能在同一台電腦上連。
 - 接 Herdr 時只用唯讀指令（`agent list／get／read`），不送鍵、不下指令。
 
 **流程**

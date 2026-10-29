@@ -25,5 +25,5 @@
     "projects": "data/projects",
     "tasks": "data/tasks"
   },
-  "minecraft": { "enabled": false, "java": "java", "memory": "2G" }
+  "minecraft": { "enabled": false, "java": "java", "memory": "2G", "guests": [] }
 }
