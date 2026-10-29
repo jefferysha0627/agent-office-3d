@@ -26,3 +26,13 @@ jobs:
         run: npm run check
       - name: Demo-mode smoke test (no Minecraft, no agents)
         run: npm run smoke
+      # Java and Minecraft are not set up on CI, so exit code 2 (office ready, Minecraft not ready) is expected.
+      # Exit code 1 (office not ready) or a crash fails the job.
+      - name: Doctor (Minecraft not set up is allowed)
+        shell: bash
+        run: |
+          set +e
+          npm run doctor
+          code=$?
+          echo "doctor exit code: $code"
+          [ "$code" -eq 0 ] || [ "$code" -eq 2 ]

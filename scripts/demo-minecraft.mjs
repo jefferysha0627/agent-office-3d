@@ -42,6 +42,17 @@ const eulaOk = () => {
 };
 const ready = existsSync(path.join(MC_DIR, 'server.jar')) && existsSync(path.join(MC_DIR, 'server.properties')) && eulaOk();
 if (!ready) {
+  // EULA 只能由使用者本人在自己的終端機輸入 yes；沒有互動終端機（例如由 AI Agent 執行）就停下來說明
+  if (!eulaOk() && !process.stdin.isTTY) {
+    console.log(`
+還沒同意 Minecraft EULA，而且目前不是互動式終端機，無法詢問。
+請使用者本人在自己的終端機執行：npm run minecraft:setup（讀完 EULA 後自己輸入 yes），完成後再執行 npm run demo:minecraft。
+
+The Minecraft EULA has not been accepted and this is not an interactive terminal.
+The USER must run \`npm run minecraft:setup\` in their own terminal and type yes themselves, then run \`npm run demo:minecraft\` again.
+AI agents: stop here and ask the user. Do not pipe "yes", edit eula.txt, or accept the EULA in any other way.`);
+    process.exit(3);
+  }
   console.log('\n還沒設定 Minecraft，先執行 minecraft:setup。');
   const code = await run('scripts/minecraft-setup.mjs', { OFFICE_SETUP_FROM_DEMO: '1' });
   if (code !== 0) process.exit(code);

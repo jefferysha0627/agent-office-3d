@@ -10,6 +10,16 @@ Turn your AI coding agents into staff in a little 3D office. See at a glance who
 
 > 畫面都是示範模式（demo），員工、任務、專案和金額全部是虛構的。
 
+## 用 AI Agent 安裝
+
+下載這個 repo 後，在資料夾裡打開你的 AI Coding Agent（Claude Code、Codex、Cursor…），直接貼上這句話：
+
+```text
+請讀這個 repo 的 AGENTS.md，幫我把 Agent Office 裝好並打開麥塊示範。
+```
+
+Agent 會照 [AGENTS.md](AGENTS.md) 先跑 `npm run doctor` 檢查環境，再幫你安裝、啟動示範，並詢問要不要接 Herdr、怎麼客製公司名稱和員工。安裝 Node.js、Java 這類系統軟體前，它會先問你；Minecraft EULA 一定要你自己輸入 `yes`，Agent 不會代為同意。Claude Code 使用者也可以直接輸入 `/setup-office`。
+
 ## 快速看麥塊
 
 不用接自己的 Agent，兩個指令就能看到示範員工偷玩 Minecraft（需要 Node.js 20 以上、Java 21 以上）：
@@ -169,6 +179,7 @@ Herdr 模式下，`staff[].id` 要和 `herdr agent list` 裡的名稱完全一�
 ## 開發
 
 ```bash
+npm run doctor  # 唯讀環境檢查（結束碼 0 全部就緒、2 Minecraft 未就緒、1 辦公室不能跑；加 -- --json 輸出 JSON）
 npm run check   # 所有 JS 語法檢查＋ JSON 格式檢查
 npm run smoke   # 示範模式冒煙測試（啟動伺服器、打 API、關閉）
 ```
@@ -183,7 +194,8 @@ lib/board-store.js     布告欄資料
 lib/projects-store.js  書架專案資料庫（只讀）
 public/                前端（Three.js）
 mc/                    Minecraft 機器人與畫面串流
-scripts/               minecraft:setup、demo:minecraft、語法檢查、冒煙測試
+scripts/               doctor、minecraft:setup、demo:minecraft、語法檢查、冒煙測試
+AGENTS.md              給 AI Agent 的安裝流程與硬性界線（CLAUDE.md、.claude/commands/setup-office.md 指向它）
 data/                  範例資料（全部虛構）
 ```
 
@@ -208,6 +220,16 @@ data/                  範例資料（全部虛構）
 ## English
 
 Agent Office 3D renders your AI coding agents as staff in a small low-poly 3D office running on your own machine.
+
+### Install with an AI agent
+
+Clone the repo, open your AI coding agent (Claude Code, Codex, Cursor, …) in the folder and paste:
+
+```text
+Read this repo's AGENTS.md and set up Agent Office for me, then open the Minecraft demo.
+```
+
+The agent follows [AGENTS.md](AGENTS.md): it runs `npm run doctor`, installs and starts the demo, then asks whether to connect Herdr and how to customize the company name and staff. It asks before installing system software such as Node.js or Java, and it will never accept the Minecraft EULA for you: you type `yes` yourself. Claude Code users can also type `/setup-office`.
 
 ### Features
 

@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "doctor": "node scripts/doctor.mjs",
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs",
     "minecraft:setup": "node scripts/minecraft-setup.mjs",
