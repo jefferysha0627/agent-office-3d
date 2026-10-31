@@ -20,7 +20,9 @@ const FAST = params.has('fast');
 const FORCED_IDLE = params.get('idle');
 // 驗證用：?cat=nap 讓貓的行程都選這個（wander／feet／desk／owner／nap）
 const FORCED_CAT = params.get('cat');
+// 員工狀態每 3 秒（只跑 agent list）；終端內容每 6 秒才讀一次（agent read 太頻繁會讓某些終端機畫面跳動）
 const POLL_MS = 3000;
+const FULL_MS = 6000;
 
 // 座位網格：前後兩排、四欄等距對齊（中間兩欄之間留通道，看得到負責人）
 const GRID_X = [-4.2, -1.4, 1.4, 4.2];
@@ -657,20 +659,55 @@ function renderTasks(tasks) {
   document.getElementById('task-count').textContent = String(tasks.length);
 }
 
+// 只讀狀態的回應沒有終端內容：沿用上一次的。有人狀態變了或新來的，下一輪就讀終端（blocked 要看到確認畫面）
+let fullSoon = false;
+function keepLines(data) {
+  if (!data.lite || !data.agents || !lastData?.agents) return;
+  const prev = new Map(lastData.agents.map((a) => [a.name, a]));
+  for (const a of data.agents) {
+    const p = prev.get(a.name);
+    if (!p || p.status !== a.status) fullSoon = true;
+    if (p && 'lines' in p) a.lines = p.lines;
+  }
+}
+
+// 分頁在背景時不輪詢，回到前景馬上讀一次。員工面板開著時，那一位每輪都讀終端（伺服器只對他縮短快取）
+let pollTimer = null;
+let polling = false;
+let lastFull = 0;
 async function poll() {
+  clearTimeout(pollTimer);
+  pollTimer = null;
+  if (document.hidden || polling) return;
+  polling = true;
+  const focus = !agentPanel.hidden && openSeat?.name;
+  const full = fullSoon || !!focus || Date.now() - lastFull >= FULL_MS;
   try {
-    const r = await fetch('/api/state', { cache: 'no-store' });
+    const qs = new URLSearchParams();
+    if (full) qs.set('full', '1');
+    if (focus) qs.set('focus', focus);
+    const r = await fetch(`/api/state?${qs}`, { cache: 'no-store' });
     if (!r.ok) throw new Error(String(r.status));
-    applyData(await r.json());
+    const data = await r.json();
+    if (full) {
+      lastFull = Date.now();
+      fullSoon = false;
+    }
+    keepLines(data);
+    applyData(data);
     document.body.classList.remove('offline');
   } catch {
     document.body.classList.add('offline');
     document.getElementById('source').textContent = '伺服器連線中斷';
     document.getElementById('source').dataset.kind = 'error';
   } finally {
-    setTimeout(poll, POLL_MS);
+    polling = false;
+    if (!document.hidden) pollTimer = setTimeout(poll, POLL_MS);
   }
 }
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) poll();
+});
 
 // ---- 面板 ----
 

@@ -87,7 +87,7 @@ Edit `office.config.json` (create it from the example first). The server reads i
 | What | Field |
 |---|---|
 | Company name | `company.name` |
-| Currency on the board | `company.currency` (for example `$`, `NT$`, `€`) |
+| Currency on the board | `company.currency` (for example `$`, `€`, `¥`) |
 | Wall sign logo (wide image) | `company.logo`: copy the user's file into `public/brand/` and point to it; SVG, PNG, JPG or WebP |
 | Small icon (header, favicon, uniform badge) | `company.mark`: square image works best |
 | The person at the front desk | `owner.name`, `owner.title` |

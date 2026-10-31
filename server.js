@@ -20,7 +20,6 @@ const config = loadConfig(ROOT);
 
 const HOST = '127.0.0.1';
 const PORT = config.port;
-const CACHE_MS = 2000;
 const TASK_MAX_BYTES = 512 * 1024;
 const TASKS_DIR = config.data.tasks;
 
@@ -49,27 +48,12 @@ const MIME = {
 // ---- 員工狀態 ----
 
 const source = createSource(config);
-let cache = { at: 0, data: null, pending: null };
 
-async function collect() {
-  const { agents, error } = await source.collect();
-  return { source: source.type, live: source.type !== 'demo', error, agents, tasks: await listTasks(), at: Date.now() };
-}
-
-async function getState() {
-  if (cache.data && Date.now() - cache.at < CACHE_MS) return cache.data;
-  if (!cache.pending) {
-    cache.pending = collect()
-      .then((data) => {
-        cache = { at: Date.now(), data, pending: null };
-        return data;
-      })
-      .catch((e) => {
-        cache.pending = null;
-        throw e;
-      });
-  }
-  return cache.pending;
+// 預設只讀狀態（Minecraft 機器人、背景分頁都用這個）；?full=1 才讀終端內容（只有前景的辦公室網頁會帶）。
+// ?focus=<員工> 讓員工面板正打開的那一位讀快一點。快取在各來源 adapter 裡（lib/sources.js）。
+async function getState({ full = false, focus = null } = {}) {
+  const { agents, error, lite } = await source.collect({ full, focus });
+  return { source: source.type, live: source.type !== 'demo', lite, error, agents, tasks: await listTasks(), at: Date.now() };
 }
 
 // ---- 任務（只讀任務資料夾第一層檔案） ----
@@ -350,7 +334,7 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (p === '/api/config') return send(res, 200, publicConfig(config));
-    if (p === '/api/state') return send(res, 200, await getState());
+    if (p === '/api/state') return send(res, 200, await getState({ full: url.searchParams.get('full') === '1', focus: url.searchParams.get('focus') }));
     if (p === '/api/task') {
       const task = await readTask(url.searchParams.get('name'));
       return task ? send(res, 200, task) : send(res, 404, { error: 'not found' });

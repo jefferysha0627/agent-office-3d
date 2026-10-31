@@ -201,10 +201,10 @@ function onServerReady() {
   syncBots();
 }
 
-// 每 3 秒讀一次辦公室的員工狀態（只讀）
+// 每 3 秒讀一次辦公室的員工狀態（只讀；lite 只跑 agent list，不讀員工終端畫面）
 async function pollOffice() {
   try {
-    const r = await fetch(`${OFFICE}/api/state`);
+    const r = await fetch(`${OFFICE}/api/state?lite=1`);
     const data = await r.json();
     if (Array.isArray(data.agents)) {
       officeStatus.clear();

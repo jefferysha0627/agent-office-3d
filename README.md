@@ -96,7 +96,7 @@ Copy-Item office.config.example.json office.config.json  # Windows PowerShell
 | `port` | 連接埠，預設 `4870` |
 | `openBrowser` | 啟動後是否自動開瀏覽器 |
 | `company.name` | 公司名稱（標題列） |
-| `company.currency` | 布告欄的貨幣符號，例如 `$`、`NT$` |
+| `company.currency` | 布告欄的貨幣符號，例如 `$`、`€`、`¥` |
 | `company.logo` | 牆上招牌的 Logo（寬版圖，SVG／PNG／JPG），路徑相對於專案資料夾 |
 | `company.mark` | 小圖示（標題列、網頁圖示、制服徽章），建議正方形 |
 | `owner.name`、`owner.title` | 坐在主管桌的人（你）的名字與職稱。主管桌只是擺設，不接任何狀態 |
@@ -124,6 +124,12 @@ Copy-Item office.config.example.json office.config.json  # Windows PowerShell
 3. `npm start`。
 
 辦公室只會呼叫 Herdr 的唯讀指令（`herdr agent list`、`herdr agent read`），程式裡有白名單擋住其他指令，不會送鍵、不會替你按確認。Herdr 在 Windows 上目前是 beta；Herdr 模式在 Windows 上未經實測。
+
+讀取節流：`herdr agent read` 太頻繁時，某些終端機（例如 Ghostty）畫面會規律跳動，所以辦公室盡量少讀：
+- 員工狀態每 3 秒只跑 `agent list`（所有請求共用 2 秒快取）；Minecraft 機器人也只讀狀態。
+- 終端內容（`agent read`）只在辦公室網頁開著、而且分頁在前景時才讀，每 6 秒一次；每位員工的結果快取 5 秒，多個瀏覽器共用，狀態一變就重讀（需要確認時改讀可見畫面）。
+- 員工面板打開時，只有那一位縮短到 2 秒。
+- 沒有網頁開著、或分頁都在背景時，不會執行任何 `agent read`。
 
 想接其他工具？在 `lib/sources.js` 加一個 adapter，回傳同樣格式的員工清單（名稱、狀態、終端最後幾行）即可。
 
@@ -219,6 +225,10 @@ AGENTS.md              給 AI Agent 的安裝流程與硬性界線（CLAUDE.md�
 data/                  範例資料（全部虛構）
 ```
 
+## 更新紀錄
+
+- **2026-10-31**：減少讀取 Herdr。狀態預設只跑 `agent list`，終端內容只在前景的辦公室分頁讀（每 6 秒、共用 5 秒快取），分頁在背景時暫停輪詢，Minecraft 機器人也只讀狀態。修正辦公室開著時終端機（Ghostty）畫面規律跳動的問題。以 5 位員工、假 Herdr 實測：沒開網頁時 `agent read` 從每分鐘約 100 次降到 0 次。
+
 ## 第三方套件與授權
 
 本專案以 [MIT License](LICENSE) 授權，著作權人 Jeffery Sha。
@@ -296,6 +306,8 @@ Copy `office.config.example.json` to `office.config.json` and edit it (it is git
 
 **Herdr mode**: set `source.type` to `"herdr"` and use your [Herdr](https://github.com/herdrdev/herdr) agent names as `staff[].id`. The office only runs the read-only commands `herdr agent list` and `herdr agent read`, enforced by an allowlist. To support another tool, add an adapter in `lib/sources.js`.
 
+Read throttling: frequent `herdr agent read` calls can make some terminals (for example Ghostty) flicker at a regular interval, so the office reads as little as possible. Statuses use only `agent list` every 3 s (shared 2 s cache), and so do the Minecraft bots. Terminal output (`agent read`) is read only while an office tab is open and in the foreground, every 6 s, with a shared 5 s per-agent cache that is refreshed as soon as a status changes. An open staff panel refreshes only that agent every 2 s. With no office tab open, or all tabs in the background, `agent read` is never called.
+
 ### Minecraft (optional)
 
 ![A staff member's Minecraft first-person view: the bot chops a tree (block cracks, axe swings, log count goes up) and walks through the forest; hotbar and held tool are the bot's real state](docs/screenshots/minecraft-closeup.gif)
@@ -349,6 +361,10 @@ Guest names are added to the whitelist together with the bots; anyone else is re
 - The server binds to `127.0.0.1` only and checks the Host header. **Do not expose it to the network**, and do not put it behind a public proxy or tunnel.
 - The only write endpoint (ticking a to-do) requires same-origin, JSON and a custom header.
 - The bookshelf only reads the folder you configure, blocks path traversal and escaping symlinks, and hides files that look like they contain secrets.
+
+### Changelog
+
+- **2026-10-31** — Fewer Herdr reads: status-only polling by default, terminal output only for a foreground office tab (every 6 s, 5 s shared cache), polling pauses in background tabs, and the Minecraft bots use status-only polling. Fixes regular terminal flicker (seen in Ghostty) while the office runs. With no tab open, `agent read` calls dropped from about 100 per minute to 0 (5 agents, measured with a fake Herdr).
 
 ### Credits and license
 
